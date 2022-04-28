@@ -4,14 +4,9 @@ using UnityEngine;
 
 public class ClickManager : MonoBehaviour
 {
-    public bool clicked;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
+    public float speed = 5f;
+    private bool nextClickWillMovePiece;
+    private GameObject piece;
     // Update is called once per frame
     void Update()
     {
@@ -20,9 +15,15 @@ public class ClickManager : MonoBehaviour
             Vector2 worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero);
 
-            if (hit.collider != null)
+            if (hit.collider != null && hit.collider.CompareTag("piece"))
             {
-                clicked = true;
+                piece = hit.collider.gameObject;
+                nextClickWillMovePiece = true;
+            }
+            else if (nextClickWillMovePiece)
+            {
+                piece.transform.position = worldPoint;
+                nextClickWillMovePiece = false;
             }
         }
 
