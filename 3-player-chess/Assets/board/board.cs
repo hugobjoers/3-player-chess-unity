@@ -9,7 +9,7 @@ public class Board : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        wBoard = new GameObject[4,8];
+        wBoard = new GameObject[8,4];
     }
 
     // Update is called once per frame
