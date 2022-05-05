@@ -24,7 +24,7 @@ public class Board : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(wBoard[0,0]);
+        // Debug.Log(wBoard[0,0]);
     }
 
     void initialiseBoard(GameObject[][,] wholeBoard)
