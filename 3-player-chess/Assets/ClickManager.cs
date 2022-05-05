@@ -24,11 +24,14 @@ public class ClickManager : MonoBehaviour
             }
             else if (nextClickWillMovePiece)
             {
-                moving = true;
+                if (IsLegalMove(hit, piece))
+                {
+                    moving = true;
+                    //Below is the instant movement version
+                    // piece.transform.position = worldPoint;
+                    // float step = speed*Time.deltaTime;
+                }
                 nextClickWillMovePiece = false;
-                //Below is the instant movement version
-                // piece.transform.position = worldPoint;
-                // float step = speed*Time.deltaTime;
             }
         }
         if (moving && !piece.transform.position.Equals(worldPoint))
@@ -41,4 +44,43 @@ public class ClickManager : MonoBehaviour
             moving = false;
         }
     }
+
+    bool IsLegalMove(RaycastHit2D hit, GameObject piece)
+    {
+        GameObject cellObject = hit.collider.gameObject;
+        Cell cell = cellObject.GetComponent("Cell") as Cell;
+        if (piece.name.Contains("pawn"))
+        {
+            if (IsEmpty(MoveDown(cell)))
+            {
+                BoxCollider2D bc = cell.cell.GetComponent("Box Collider 2D") as BoxCollider2D;
+                Collider2D[] results = new Collider2D[1]; 
+                ContactFilter2D cf = new ContactFilter2D().NoFilter();
+                bc.OverlapCollider(cf, results);
+                if(results[0].gameObject == piece)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    bool IsEmpty(Cell cell)
+    {
+        if (cell == null)
+        {
+            return false;
+        }
+        return !cell.occupied;
+    }
+
+    Cell MoveDown(Cell cell)
+    {
+        Debug.Log(cell);
+        Cell newCell = cell.b.wholeBoard[cell.homeBoardOf][cell.yindex, cell.xindex].GetComponent("Cell") as Cell;
+        Debug.Log("newCell" + newCell);
+        return newCell;
+    }
+
 }

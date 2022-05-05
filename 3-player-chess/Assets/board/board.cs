@@ -18,7 +18,7 @@ public class Board : MonoBehaviour
         yBoard = new GameObject[4,8];
         bBoard = new GameObject[4,8];
         wholeBoard = new GameObject[3][,]{wBoard, yBoard, bBoard};
-        initialiseBoard(wholeBoard);
+        // initialiseBoard(wholeBoard);
     }
 
     // Update is called once per frame
