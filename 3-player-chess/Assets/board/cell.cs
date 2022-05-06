@@ -21,9 +21,9 @@ public class Cell : MonoBehaviour
     void Start()
     {
         nameOfCell = gameObject.name;
-        xindex = int.Parse(nameOfCell.Substring(0,1));
+        xindex = int.Parse(nameOfCell.Substring(2,1));
         yindex = int.Parse(nameOfCell.Substring(1,1));
-        homeBoardOf = int.Parse(nameOfCell.Substring(2,1));
+        homeBoardOf = int.Parse(nameOfCell.Substring(0,1));
     }
 
     // Update is called once per frame
