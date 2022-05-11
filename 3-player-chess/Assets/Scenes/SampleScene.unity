@@ -569,6 +569,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: board
       objectReference: {fileID: 0}
+    - target: {fileID: 7649668410364147478, guid: c4832d183b1a09543b6390028e4ebc18, type: 3}
+      propertyPath: m_TagString
+      value: board
+      objectReference: {fileID: 0}
     - target: {fileID: 7898400615888084068, guid: c4832d183b1a09543b6390028e4ebc18, type: 3}
       propertyPath: m_RootOrder
       value: 6

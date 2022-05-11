@@ -6,6 +6,8 @@ TagManager:
   tags:
   - piece
   - tile
+  - cell
+  - board
   layers:
   - Default
   - TransparentFX
