@@ -373,6 +373,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -7871556540511652807, guid: 2b4e51f9ab9f5f046895540b77b6aa51, type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -7871556540511652807, guid: 2b4e51f9ab9f5f046895540b77b6aa51, type: 3}
+      propertyPath: m_SortingOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7871556540511652807, guid: 2b4e51f9ab9f5f046895540b77b6aa51, type: 3}
+      propertyPath: m_SortingLayerID
+      value: -1632576119
+      objectReference: {fileID: 0}
     - target: {fileID: -3888481672020999207, guid: 2b4e51f9ab9f5f046895540b77b6aa51, type: 3}
       propertyPath: m_Name
       value: pawn_white
@@ -399,15 +411,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8742538545776668643, guid: 2b4e51f9ab9f5f046895540b77b6aa51, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.43
+      value: -2.83
       objectReference: {fileID: 0}
     - target: {fileID: 8742538545776668643, guid: 2b4e51f9ab9f5f046895540b77b6aa51, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.66
+      value: -3.7
       objectReference: {fileID: 0}
     - target: {fileID: 8742538545776668643, guid: 2b4e51f9ab9f5f046895540b77b6aa51, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -5
       objectReference: {fileID: 0}
     - target: {fileID: 8742538545776668643, guid: 2b4e51f9ab9f5f046895540b77b6aa51, type: 3}
       propertyPath: m_LocalRotation.w

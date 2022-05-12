@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ClickManager : MonoBehaviour
 {
-    Vector2 worldPoint;
+    Vector3 worldPoint;
     private bool nextClickWillMovePiece;
     public float speed;
     private bool moving;
@@ -14,52 +14,48 @@ public class ClickManager : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
+            //https://answers.unity.com/questions/598492/how-do-you-set-an-order-for-2d-colliders-that-over.html
             worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            worldPoint.z = Camera.main.transform.position.z;
+            Ray ray = new Ray(worldPoint, new Vector3(0, 0, 1));
             RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero);
 
             if (hit.collider != null && hit.collider.CompareTag("piece"))
             {
                 piece = hit.collider.gameObject;
                 nextClickWillMovePiece = true;
+                Debug.Log("clicked piece");
             }
             else if (nextClickWillMovePiece)
             {
                 if (IsLegalMove(hit, piece))
                 {
-                    moving = true;
-                    //Below is the instant movement version
-                    // piece.transform.position = worldPoint;
-                    // float step = speed*Time.deltaTime;
+                    piece.transform.position = new Vector3(worldPoint.x, worldPoint.y, piece.transform.position.z);
                 }
                 nextClickWillMovePiece = false;
             }
-        }
-        if (moving && !piece.transform.position.Equals(worldPoint))
-        {
-            float step = speed * Time.deltaTime;
-            piece.transform.position = Vector2.MoveTowards(piece.transform.position, worldPoint, step);
-        }
-        else
-        {
-            moving = false;
         }
     }
 
     bool IsLegalMove(RaycastHit2D hit, GameObject piece)
     {
         GameObject cellObject = hit.collider.gameObject;
-        Cell cell = cellObject.GetComponent("Cell") as Cell;
+        Cell cell = cellObject.GetComponent<Cell>();
         if (piece.name.Contains("pawn"))
         {
-            if (IsEmpty(MoveDown(cell)))
+            cell = MoveDown(cell);
+            if (IsEmpty(cell))
             {
-                BoxCollider2D bc = cell.cell.GetComponent("Box Collider 2D") as BoxCollider2D;
-                Collider2D[] results = new Collider2D[1]; 
+                BoxCollider2D bc = cell.GetComponent<BoxCollider2D>();
+                Collider2D[] results = new Collider2D[5];
                 ContactFilter2D cf = new ContactFilter2D().NoFilter();
                 bc.OverlapCollider(cf, results);
-                if(results[0].gameObject == piece)
+                foreach (Collider2D obj in results)
                 {
-                    return true;
+                    if (obj.gameObject == piece)
+                    {
+                        return true;
+                    }
                 }
             }
         }
@@ -74,13 +70,32 @@ public class ClickManager : MonoBehaviour
         }
         return !cell.occupied;
     }
-
     Cell MoveDown(Cell cell)
     {
-        Debug.Log(cell);
-        Cell newCell = cell.b.wholeBoard[cell.homeBoardOf][cell.yindex, cell.xindex].GetComponent("Cell") as Cell;
-        Debug.Log("newCell" + newCell);
+        Board b = cell.b.GetComponent<Board>();
+        Cell newCell = b.wholeBoard[cell.homeBoardOf, cell.xindex, cell.yindex + 1].GetComponent<Cell>();
         return newCell;
+
+    }
+
+    bool pawnMovement(Cell cell)
+    {
+        cell = MoveDown(cell);
+        if (IsEmpty(cell))
+        {
+            BoxCollider2D bc = cell.GetComponent<BoxCollider2D>();
+            Collider2D[] results = new Collider2D[5];
+            ContactFilter2D cf = new ContactFilter2D().NoFilter();
+            bc.OverlapCollider(cf, results);
+            foreach (Collider2D obj in results)
+            {
+                if (obj.gameObject == piece)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }
