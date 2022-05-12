@@ -1,17 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class Cell : MonoBehaviour
 {
-    public GameObject cell;
-    public Board b;
+    public GameObject b;
     public string nameOfCell;
     public int xindex;
     public int yindex;
     public int homeBoardOf; //0 if whites, 1 if yellows and 2 if blacks
-    public bool color; //true if black, false if not
-
     public bool occupied; //true if piece on cell, otherwise false
 
     public int occupant; //0 if white, 1 if yellow, 2 if black
@@ -23,10 +21,10 @@ public class Cell : MonoBehaviour
     void Start()
     {
         nameOfCell = gameObject.name;
-        xindex = int.Parse(nameOfCell.Substring(0, 1));
-        yindex = int.Parse(nameOfCell.Substring(1, 1));
-        homeBoardOf = int.Parse(nameOfCell.Substring(2, 1));
-        b.wholeBoard[homeBoardOf][yindex, xindex] = cell;
+        homeBoardOf = int.Parse(nameOfCell.Substring(0,1));
+        xindex = int.Parse(nameOfCell.Substring(1,1));
+        yindex = int.Parse(nameOfCell.Substring(2,1));
+        b = GameObject.FindGameObjectWithTag("board");
     }
 
     // Update is called once per frame
