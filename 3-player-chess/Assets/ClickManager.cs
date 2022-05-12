@@ -58,14 +58,14 @@ public class ClickManager : MonoBehaviour
     }
     Cell MoveDown(Cell cell, int toBoard)
     {
-        Debug.Log(cell);
-        Debug.Log(cell.yindex == 0 && cell.homeBoard != toBoard);
-        Debug.Log(toBoard);
-        Debug.Log(cell.homeBoard != toBoard);
         Board b = cell.b.GetComponent<Board>();
         if (cell.yindex == 0 && cell.homeBoard != toBoard)
         {
             return b.wholeBoard[cell.homeBoard, cell.xindex, 0].GetComponent<Cell>();
+        }
+        if (cell.homeBoard != toBoard)
+        {
+            return b.wholeBoard[cell.homeBoard, cell.xindex, cell.yindex - 1].GetComponent<Cell>();
         }
         return b.wholeBoard[cell.homeBoard, cell.xindex, cell.yindex + 1].GetComponent<Cell>();
 
