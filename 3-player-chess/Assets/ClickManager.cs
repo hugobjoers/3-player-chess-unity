@@ -43,21 +43,7 @@ public class ClickManager : MonoBehaviour
         Cell cell = cellObject.GetComponent<Cell>();
         if (piece.name.Contains("pawn"))
         {
-            cell = MoveDown(cell);
-            if (IsEmpty(cell))
-            {
-                BoxCollider2D bc = cell.GetComponent<BoxCollider2D>();
-                Collider2D[] results = new Collider2D[5];
-                ContactFilter2D cf = new ContactFilter2D().NoFilter();
-                bc.OverlapCollider(cf, results);
-                foreach (Collider2D obj in results)
-                {
-                    if (obj.gameObject == piece)
-                    {
-                        return true;
-                    }
-                }
-            }
+            return PawnMovement(cell, piece);
         }
         return false;
     }
@@ -70,17 +56,24 @@ public class ClickManager : MonoBehaviour
         }
         return !cell.occupied;
     }
-    Cell MoveDown(Cell cell)
+    Cell MoveDown(Cell cell, int toBoard)
     {
+        Debug.Log(cell);
+        Debug.Log(cell.yindex == 0 && cell.homeBoard != toBoard);
+        Debug.Log(toBoard);
+        Debug.Log(cell.homeBoard != toBoard);
         Board b = cell.b.GetComponent<Board>();
-        Cell newCell = b.wholeBoard[cell.homeBoardOf, cell.xindex, cell.yindex + 1].GetComponent<Cell>();
-        return newCell;
+        if (cell.yindex == 0 && cell.homeBoard != toBoard)
+        {
+            return b.wholeBoard[cell.homeBoard, cell.xindex, 0].GetComponent<Cell>();
+        }
+        return b.wholeBoard[cell.homeBoard, cell.xindex, cell.yindex + 1].GetComponent<Cell>();
 
     }
 
-    bool pawnMovement(Cell cell)
+    bool PawnMovement(Cell cell, GameObject piece)
     {
-        cell = MoveDown(cell);
+        cell = MoveDown(cell, piece.GetComponent<Piece>().homeBoard);
         if (IsEmpty(cell))
         {
             BoxCollider2D bc = cell.GetComponent<BoxCollider2D>();
