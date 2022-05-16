@@ -20,6 +20,7 @@ public class ClickManager : MonoBehaviour
             Ray ray = new Ray(worldPoint, new Vector3(0, 0, 1));
             RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero);
 
+            Debug.Log(hit.collider.gameObject);
             if (hit.collider != null && hit.collider.CompareTag("piece"))
             {
                 piece = hit.collider.gameObject;
@@ -43,6 +44,7 @@ public class ClickManager : MonoBehaviour
         Cell cell = cellObject.GetComponent<Cell>();
         if (piece.name.Contains("pawn"))
         {
+            Debug.Log("pawnmovement");
             return PawnMovement(cell, piece);
         }
         return false;
@@ -59,6 +61,7 @@ public class ClickManager : MonoBehaviour
     Cell MoveDown(Cell cell, int toBoard)
     {
         Board b = cell.b.GetComponent<Board>();
+        Debug.Log("brädet" + b.wholeBoard);
         if (cell.yindex == 0 && cell.homeBoard != toBoard)
         {
             return b.wholeBoard[cell.homeBoard, cell.xindex, 0].GetComponent<Cell>();
