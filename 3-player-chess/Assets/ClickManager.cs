@@ -71,25 +71,86 @@ public class ClickManager : MonoBehaviour
             return b.wholeBoard[cell.homeBoard, cell.xindex, cell.yindex - 1].GetComponent<Cell>();
         }
         return b.wholeBoard[cell.homeBoard, cell.xindex, cell.yindex + 1].GetComponent<Cell>();
+    }
 
+    Cell MoveLeft(Cell cell)
+    {
+        Board b = cell.b.GetComponent<Board>();
+        return b.wholeBoard[cell.homeBoard, cell.xindex - 1, cell.yindex].GetComponent<Cell>();
     }
 
     bool PawnMovement(Cell cell, GameObject piece)
     {
-        cell = MoveDown(cell, piece.GetComponent<Piece>().homeBoard);
+        return PawnOnlyMovement(cell, piece) || PawnTake(cell, piece);
+    }
+
+    bool PawnOnlyMovement(Cell cell, GameObject piece)
+    {
+        int toBoard = piece.GetComponent<Piece>().homeBoard;
+        Cell newCell = MoveDown(cell, toBoard);
         if (IsEmpty(cell))
         {
-            BoxCollider2D bc = cell.GetComponent<BoxCollider2D>();
-            Collider2D[] results = new Collider2D[5];
-            ContactFilter2D cf = new ContactFilter2D().NoFilter();
-            bc.OverlapCollider(cf, results);
+            Collider2D[] results = Collisions(newCell);
             foreach (Collider2D obj in results)
             {
                 Debug.Log(obj);
                 if (obj.gameObject == piece)
                 {
+                    cell.occupied = true;
+                    newCell.occupied = false;
                     return true;
                 }
+            }
+        }
+        return false;
+    }
+
+    Collider2D[] Collisions(Cell newCell)
+    {
+        BoxCollider2D bc = newCell.GetComponent<BoxCollider2D>();
+        Collider2D[] results = new Collider2D[5];
+        ContactFilter2D cf = new ContactFilter2D().NoFilter();
+        bc.OverlapCollider(cf, results);
+        return results;
+    }
+
+    bool PawnTake(Cell cell, GameObject piece)
+    {
+        int toBoard = piece.GetComponent<Piece>().homeBoard;
+        Cell newCell = MoveDown(MoveLeft(cell), toBoard);
+        Collider2D[] results = Collisions(newCell);
+        bool validMove = false;
+        foreach (Collider2D obj in results)
+        {
+            if (obj.gameObject == piece)
+            {
+                validMove = true;
+            }
+        }
+        if (validMove && EnemyIsInCell(cell, newCell, toBoard))
+        {
+            Collider2D[] enemy = Collisions(cell);
+            foreach (Collider2D obj in enemy)
+            {
+                if (obj.gameObject.GetComponent<Piece>().homeBoard != toBoard)
+                {
+                    Destroy(obj.gameObject);
+                    newCell.occupied = false;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    bool EnemyIsInCell(Cell cell, Cell newCell, int homeColor)
+    {
+        Collider2D[] results = Collisions(cell);
+        foreach (Collider2D obj in results)
+        {
+            if (obj.gameObject.GetComponent<Piece>().homeBoard != homeColor)
+            {
+                return true;
             }
         }
         return false;
