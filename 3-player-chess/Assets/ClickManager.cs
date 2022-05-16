@@ -47,6 +47,11 @@ public class ClickManager : MonoBehaviour
             Debug.Log("pawnmovement");
             return PawnMovement(cell, piece);
         }
+        else if(piece.name.Contains("king"))
+        {
+            Debug.Log("kingmovement");
+            return KingMovement(cell,piece);
+        }
         return false;
     }
 
@@ -93,6 +98,11 @@ public class ClickManager : MonoBehaviour
             }
         }
         return false;
+    }
+
+    bool KingMovement(Cell cell, GameObject piece)
+    {
+        return PawnMovement(cell, piece);
     }
 
 }
