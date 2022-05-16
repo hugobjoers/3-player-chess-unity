@@ -61,10 +61,10 @@ public class ClickManager : MonoBehaviour
     Cell MoveDown(Cell cell, int toBoard)
     {
         Board b = cell.b.GetComponent<Board>();
-        Debug.Log("brädet" + b.wholeBoard);
+        Debug.Log("brädet" + b.wholeBoard[cell.homeBoard, cell.xindex, 0]);
         if (cell.yindex == 0 && cell.homeBoard != toBoard)
         {
-            return b.wholeBoard[cell.homeBoard, cell.xindex, 0].GetComponent<Cell>();
+            return b.wholeBoard[toBoard, 7 - cell.xindex, 0].GetComponent<Cell>();
         }
         if (cell.homeBoard != toBoard)
         {
@@ -85,6 +85,7 @@ public class ClickManager : MonoBehaviour
             bc.OverlapCollider(cf, results);
             foreach (Collider2D obj in results)
             {
+                Debug.Log(obj);
                 if (obj.gameObject == piece)
                 {
                     return true;
