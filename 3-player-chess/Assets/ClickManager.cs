@@ -79,6 +79,32 @@ public class ClickManager : MonoBehaviour
 
     }
 
+    Cell MoveRight(Cell cell, int toBoard)
+    {
+        Board b = cell.b.GetComponent<Board>();
+        if(cell.homeBoard != toBoard)
+        {
+            return b.wholeBoard[toBoard, cell.xindex -1, cell.yindex].GetComponent<Cell>();
+        }
+        else
+        {
+            return b.wholeBoard[toBoard, cell.xindex + 1, cell.yindex].GetComponent<Cell>();
+        }
+    }
+
+    Cell MoveLeft(Cell cell, int toBoard)
+    {
+        Board b = cell.b.GetComponent<Board>();
+        if(cell.homeBoard != toBoard)
+        {
+            return b.wholeBoard[toBoard, cell.xindex +1, cell.yindex].GetComponent<Cell>();
+        }
+        else
+        {
+            return b.wholeBoard[toBoard, cell.xindex -1, cell.yindex].GetComponent<Cell>();
+        }
+    }
+
     bool PawnMovement(Cell cell, GameObject piece)
     {
         cell = MoveDown(cell, piece.GetComponent<Piece>().homeBoard);
