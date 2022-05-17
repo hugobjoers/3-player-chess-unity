@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class ClickManager : MonoBehaviour
@@ -19,22 +20,41 @@ public class ClickManager : MonoBehaviour
             worldPoint.z = Camera.main.transform.position.z;
             Ray ray = new Ray(worldPoint, new Vector3(0, 0, 1));
             RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero);
-
+            if (hit.collider == null)
+            {
+                return;
+            }
             Debug.Log(hit.collider.gameObject);
             if (hit.collider != null && hit.collider.CompareTag("piece"))
             {
                 piece = hit.collider.gameObject;
                 nextClickWillMovePiece = true;
-                Debug.Log("clicked piece");
+                PieceZPos(5);
             }
             else if (nextClickWillMovePiece)
             {
+                nextClickWillMovePiece = false;
+                PieceZPos(-5);
                 if (IsLegalMove(hit, piece))
                 {
                     piece.transform.position = new Vector3(worldPoint.x, worldPoint.y, piece.transform.position.z);
                 }
-                nextClickWillMovePiece = false;
             }
+            else
+            {
+                nextClickWillMovePiece = false;
+                PieceZPos(-5);
+            }
+        }
+    }
+
+    void PieceZPos(int z)
+    {
+        GameObject[] pieces = GameObject.FindGameObjectsWithTag("piece");
+        foreach (GameObject obj in pieces)
+        {
+            Vector3 pos = obj.transform.position;
+            obj.transform.position = new Vector3(pos.x, pos.y, z);
         }
     }
 
@@ -44,7 +64,6 @@ public class ClickManager : MonoBehaviour
         Cell cell = cellObject.GetComponent<Cell>();
         if (piece.name.Contains("pawn"))
         {
-            Debug.Log("pawnmovement");
             return PawnMovement(cell, piece);
         }
         return false;
@@ -61,10 +80,10 @@ public class ClickManager : MonoBehaviour
     Cell MoveDown(Cell cell, int toBoard)
     {
         Board b = cell.b.GetComponent<Board>();
-        Debug.Log("brädet" + b.wholeBoard[cell.homeBoard, cell.xindex, 0]);
         if (cell.yindex == 0 && cell.homeBoard != toBoard)
         {
             return b.wholeBoard[toBoard, 7 - cell.xindex, 0].GetComponent<Cell>();
+
         }
         if (cell.homeBoard != toBoard)
         {
@@ -88,12 +107,20 @@ public class ClickManager : MonoBehaviour
     {
         int toBoard = piece.GetComponent<Piece>().homeBoard;
         Cell newCell = MoveDown(cell, toBoard);
+        if (cell == null)
+        {
+            return false;
+        }
         if (IsEmpty(cell))
         {
+
             Collider2D[] results = Collisions(newCell);
             foreach (Collider2D obj in results)
             {
-                Debug.Log(obj);
+                if (obj == null)
+                {
+                    return false;
+                }
                 if (obj.gameObject == piece)
                 {
                     cell.occupied = true;
@@ -118,15 +145,20 @@ public class ClickManager : MonoBehaviour
     {
         int toBoard = piece.GetComponent<Piece>().homeBoard;
         Cell newCell = MoveDown(MoveLeft(cell), toBoard);
+        if (newCell == null)
+        {
+            return false;
+        }
         Collider2D[] results = Collisions(newCell);
         bool validMove = false;
         foreach (Collider2D obj in results)
         {
-            if (obj.gameObject == piece)
+            if (obj != null && obj.gameObject == piece)
             {
                 validMove = true;
             }
         }
+        //Debug.Log("cleared own piece");
         if (validMove && EnemyIsInCell(cell, newCell, toBoard))
         {
             Collider2D[] enemy = Collisions(cell);
@@ -136,6 +168,7 @@ public class ClickManager : MonoBehaviour
                 {
                     Destroy(obj.gameObject);
                     newCell.occupied = false;
+                    return true;
                 }
             }
         }
@@ -148,6 +181,10 @@ public class ClickManager : MonoBehaviour
         Collider2D[] results = Collisions(cell);
         foreach (Collider2D obj in results)
         {
+            if(obj == null)
+            {
+                //return false;
+            }
             if (obj.gameObject.GetComponent<Piece>().homeBoard != homeColor)
             {
                 return true;
