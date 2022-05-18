@@ -103,12 +103,10 @@ public class ClickManager : MonoBehaviour
         {
             if (cell.homeBoard != toBoard)
             {
-                // Debug.Log("left " + b.wholeBoard[cell.homeBoard, cell.xindex + 1, cell.yindex]);
                 return b.wholeBoard[cell.homeBoard, cell.xindex + 1, cell.yindex].GetComponent<Cell>();
             }
             else
             {
-                // Debug.Log("left " + b.wholeBoard[cell.homeBoard, cell.xindex - 1, cell.yindex]);
                 return b.wholeBoard[cell.homeBoard, cell.xindex - 1, cell.yindex].GetComponent<Cell>();
             }
         }
@@ -122,17 +120,13 @@ public class ClickManager : MonoBehaviour
         Board b = cell.b.GetComponent<Board>();
         try
         {
-            Debug.Log("MoveRIght");
-            Debug.Log("homeborad" + cell.homeBoard);
             if (cell.homeBoard != toBoard)
             {
-                Debug.Log("right ↓");
                 Debug.Log(b.wholeBoard[cell.homeBoard, cell.xindex - 1, cell.yindex]);
                 return b.wholeBoard[cell.homeBoard, cell.xindex - 1, cell.yindex].GetComponent<Cell>();
             }
             else
             {
-                // Debug.Log("left " + b.wholeBoard[cell.homeBoard, cell.xindex + 1, cell.yindex]);
                 return b.wholeBoard[cell.homeBoard, cell.xindex + 1, cell.yindex].GetComponent<Cell>();
             }
         }
@@ -146,14 +140,7 @@ public class ClickManager : MonoBehaviour
     {
         int toBoard = piece.GetComponent<Piece>().homeBoard;
         bool onm = PawnOnlyMovement(cell, piece);
-        Cell l = MoveLeft(cell, toBoard);
-        Debug.Log("l " + l);
-        Cell ld = MoveDown(l, toBoard);
-        Debug.Log("ld " + ld);
         bool take = PawnTake(cell, piece, MoveDown(MoveLeft(cell, toBoard), toBoard)) || PawnTake(cell, piece, MoveDown(MoveRight(cell, toBoard), toBoard));
-        Debug.Log("onm " + onm);
-        Debug.Log("take " + take);
-        // return PawnOnlyMovement(cell, piece) || PawnTake(cell, piece);
         return onm || take;
     }
 
