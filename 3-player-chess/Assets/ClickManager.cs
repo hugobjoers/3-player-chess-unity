@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
-using Math;
 
 public class ClickManager : MonoBehaviour
 {
@@ -216,11 +215,11 @@ public class ClickManager : MonoBehaviour
     bool KingMovement(Cell cell, GameObject piece)
     {  
         //if cell is not in contact with current cell, return false 
-        if( cell.b != piece.currentBoard && cell.yindex != 0) //trying to move accross board but not adjacent to other board
+        if( cell.homeBoard != piece.GetComponent<Piece>().currentBoard && cell.yindex != 0) //trying to move accross board but not adjacent to other board
         {
             return false;
         }
-        else if(Math.Abs(cell.xindex - piece.currentX) > 1 || Math.Abs(cell.yindex -piece.currentY) >1) //trying to move further than one step
+        else if(Math.Abs(cell.xindex - piece.GetComponent<Piece>().currentX) > 1 || Math.Abs(cell.yindex -piece.GetComponent<Piece>().currentY) >1) //trying to move further than one step
         {
             return false;
         }
