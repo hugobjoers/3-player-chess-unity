@@ -7,6 +7,12 @@ public class Board : MonoBehaviour
 {   
     public GameObject cellPrefab;
 
+    public GameObject[] pawnPrefabs; //pawnPrefabs in order white, yellow, black
+
+    public GameObject[] kingPrefabs; //kingPrefabs in order white, yellow, black
+
+    private string[] pieceColors = {"white", "yellow", "black"};
+
     private double[] angles = new double[]{Mathf.PI*3/2, Mathf.PI*5/6, Mathf.PI*1/6}; 
     //angles is an array of the angles of the rotation for the center line of each homeboard around origo
 
@@ -50,9 +56,14 @@ public class Board : MonoBehaviour
                     double[] pos = Pos(b,j,i); 
                     wholeBoard[b,j,i] = Instantiate(cellPrefab, new Vector2((float)pos[0],(float)pos[1]), Quaternion.identity);
                     //creates GameObjects in the game at position pos in the image of cellPrefab and stores thiese GameObjects in wholeBoard
-
                     wholeBoard[b,j,i].tag = "cell";
                     wholeBoard[b,j,i].name = b.ToString() + j.ToString() + i.ToString();
+                    
+                    if (i == 2 || i == 3 && j == 4) //we are on the y index where pieces should be initiated
+                    {
+                        GameObject piece = Instantiate(GetPiecePrefab(b,j,i), new Vector2((float)pos[0],(float)pos[1]), Quaternion.identity);
+                        piece.name = GetPieceName(b,j,i);
+                    } 
                 }
             }
         }
@@ -91,6 +102,42 @@ public class Board : MonoBehaviour
         
         double[] pos = new double[]{x,y};
         return pos;
+    }
+
+    //Method for getting correct piece prefab
+    //that should be initiated on given cell (indexes)
+    GameObject GetPiecePrefab(int b, int j, int i)
+    {
+        if (i == 2)
+        {
+            return pawnPrefabs[b];
+        }
+        else if (j == 4)
+        {
+            return kingPrefabs[b];
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    //Method for getting correct piece name
+    //based on which cell (index) it is initiated on
+    string GetPieceName(int b, int j, int i)
+    {
+        string pieceName= "";
+        if(i == 2)
+        {
+            pieceName = "pawn_";
+        }
+        else if(j == 4)
+        {
+            pieceName = "king_";
+        }
+        pieceName += pieceColors[b];
+        return pieceName;
+        
     }
 
 }

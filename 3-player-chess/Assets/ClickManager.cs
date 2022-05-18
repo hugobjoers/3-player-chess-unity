@@ -66,6 +66,11 @@ public class ClickManager : MonoBehaviour
         {
             return PawnMovement(cell, piece);
         }
+        else if(piece.name.Contains("king"))
+        {
+            Debug.Log("kingmovement");
+            return KingMovement(cell,piece);
+        }
         return false;
     }
 
@@ -95,6 +100,7 @@ public class ClickManager : MonoBehaviour
         }
         return b.wholeBoard[cell.homeBoard, cell.xindex, cell.yindex + 1].GetComponent<Cell>(); //On homeBoard
     }
+
 
         Cell MoveLeft(Cell cell, int toBoard)
         {
@@ -206,6 +212,13 @@ public class ClickManager : MonoBehaviour
             return false;
         }
 
+
+    bool KingMovement(Cell cell, GameObject piece)
+    {
+        return PawnMovement(cell, piece);
+    }
+
+
         void DestroyEnemyInCell(Cell cell, Cell newCell, int takingColor)
         {
             Collider2D[] results = Collisions(cell);
@@ -222,4 +235,5 @@ public class ClickManager : MonoBehaviour
                 }
             }
         }
+
 }
