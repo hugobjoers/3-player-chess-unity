@@ -11,11 +11,11 @@ public class Piece : MonoBehaviour
         {
             homeBoard = 0;
         }
-        else if(gameObject.name.Contains("black"))
+        else if(gameObject.name.Contains("yellow"))
         {
             homeBoard = 1;
         }
-        else if(gameObject.name.Contains("yellow"))
+        else if(gameObject.name.Contains("black"))
         {
             homeBoard = 2;
         }
