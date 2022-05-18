@@ -39,6 +39,7 @@ public class Cell : MonoBehaviour
         xindex = int.Parse(nameOfCell.Substring(1,1));
         yindex = int.Parse(nameOfCell.Substring(2,1));
         b = GameObject.FindGameObjectWithTag("board");
+        gameObject.transform.SetParent(b.transform);
     }
 
     // Update is called once per frame
