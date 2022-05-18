@@ -79,6 +79,10 @@ public class ClickManager : MonoBehaviour
     }
     Cell MoveDown(Cell cell, int toBoard)
     {
+        if (cell == null)
+        {
+            return null;
+        }
         Board b = cell.b.GetComponent<Board>();
         if (cell.yindex == 0 && cell.homeBoard != toBoard)
         {
@@ -92,28 +96,71 @@ public class ClickManager : MonoBehaviour
         return b.wholeBoard[cell.homeBoard, cell.xindex, cell.yindex + 1].GetComponent<Cell>();
     }
 
-    Cell MoveLeft(Cell cell)
+    Cell MoveLeft(Cell cell, int toBoard)
     {
         Board b = cell.b.GetComponent<Board>();
-        return b.wholeBoard[cell.homeBoard, cell.xindex - 1, cell.yindex].GetComponent<Cell>();
+        try
+        {
+            if (cell.homeBoard != toBoard)
+            {
+                Debug.Log("left " + b.wholeBoard[cell.homeBoard, cell.xindex + 1, cell.yindex]);
+                return b.wholeBoard[cell.homeBoard, cell.xindex + 1, cell.yindex].GetComponent<Cell>();
+            }
+            else
+            {
+                Debug.Log("left " + b.wholeBoard[cell.homeBoard, cell.xindex - 1, cell.yindex]);
+                return b.wholeBoard[cell.homeBoard, cell.xindex - 1, cell.yindex].GetComponent<Cell>();
+            }
+        }
+        catch (System.IndexOutOfRangeException)
+        {
+            return null;
+        }
+    }
+    Cell MoveRight(Cell cell, int toBoard)
+    {
+        Board b = cell.b.GetComponent<Board>();
+        try
+        {
+            if (cell.homeBoard != toBoard)
+            {
+                // Debug.Log("left " + b.wholeBoard[cell.homeBoard, cell.xindex - 1, cell.yindex]);
+                return b.wholeBoard[cell.homeBoard, cell.xindex - 1, cell.yindex].GetComponent<Cell>();
+            }
+            else
+            {
+                // Debug.Log("left " + b.wholeBoard[cell.homeBoard, cell.xindex + 1, cell.yindex]);
+                return b.wholeBoard[cell.homeBoard, cell.xindex + 1, cell.yindex].GetComponent<Cell>();
+            }
+        }
+        catch (System.IndexOutOfRangeException)
+        {
+            return null;
+        }
     }
 
     bool PawnMovement(Cell cell, GameObject piece)
     {
-        return PawnOnlyMovement(cell, piece) || PawnTake(cell, piece);
+        int toBoard = piece.GetComponent<Piece>().homeBoard;
+        bool onm = PawnOnlyMovement(cell, piece);
+        bool take = PawnTake(cell, piece, MoveDown(MoveLeft(cell, toBoard), toBoard)) || PawnTake(cell, piece, MoveDown(MoveRight(cell, toBoard), toBoard));
+        Debug.Log("onm " + onm);
+        Debug.Log("take " + take);
+        // return PawnOnlyMovement(cell, piece) || PawnTake(cell, piece);
+        return onm || take;
     }
 
     bool PawnOnlyMovement(Cell cell, GameObject piece)
     {
         int toBoard = piece.GetComponent<Piece>().homeBoard;
         Cell newCell = MoveDown(cell, toBoard);
-        if (cell == null)
+        Debug.Log("down newCell" + newCell);
+        if (newCell == null)
         {
             return false;
         }
         if (IsEmpty(cell))
         {
-
             Collider2D[] results = Collisions(newCell);
             foreach (Collider2D obj in results)
             {
@@ -141,10 +188,9 @@ public class ClickManager : MonoBehaviour
         return results;
     }
 
-    bool PawnTake(Cell cell, GameObject piece)
+    bool PawnTake(Cell cell, GameObject piece, Cell newCell)
     {
-        int toBoard = piece.GetComponent<Piece>().homeBoard;
-        Cell newCell = MoveDown(MoveLeft(cell), toBoard);
+        int toBoard = newCell.homeBoard;
         if (newCell == null)
         {
             return false;
@@ -158,7 +204,6 @@ public class ClickManager : MonoBehaviour
                 validMove = true;
             }
         }
-        //Debug.Log("cleared own piece");
         if (validMove && EnemyIsInCell(cell, newCell, toBoard))
         {
             Collider2D[] enemy = Collisions(cell);
@@ -172,7 +217,6 @@ public class ClickManager : MonoBehaviour
                 }
             }
         }
-
         return false;
     }
 
@@ -181,11 +225,11 @@ public class ClickManager : MonoBehaviour
         Collider2D[] results = Collisions(cell);
         foreach (Collider2D obj in results)
         {
-            if(obj == null)
+            if (obj == null)
             {
-                //return false;
+                return false;
             }
-            if (obj.gameObject.GetComponent<Piece>().homeBoard != homeColor)
+            if (obj.CompareTag("piece") && obj.gameObject.GetComponent<Piece>().homeBoard != homeColor) //is an enemy piece
             {
                 return true;
             }
