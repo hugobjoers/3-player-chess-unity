@@ -18,7 +18,7 @@ public class ClickManager : MonoBehaviour
             worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             worldPoint.z = Camera.main.transform.position.z;
             Ray ray = new Ray(worldPoint, new Vector3(0, 0, 1));
-            RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero);
+            RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero); //Positioin of the mouse cursor
 
             Debug.Log(hit.collider.gameObject);
             if (hit.collider != null && hit.collider.CompareTag("piece"))
@@ -62,15 +62,15 @@ public class ClickManager : MonoBehaviour
     {
         Board b = cell.b.GetComponent<Board>();
         Debug.Log("brädet" + b.wholeBoard[cell.homeBoard, cell.xindex, 0]);
-        if (cell.yindex == 0 && cell.homeBoard != toBoard)
+        if (cell.yindex == 0 && cell.homeBoard != toBoard) //Crossing into another board
         {
             return b.wholeBoard[toBoard, 7 - cell.xindex, 0].GetComponent<Cell>();
         }
-        if (cell.homeBoard != toBoard)
+        if (cell.homeBoard != toBoard) //On another board
         {
             return b.wholeBoard[cell.homeBoard, cell.xindex, cell.yindex - 1].GetComponent<Cell>();
         }
-        return b.wholeBoard[cell.homeBoard, cell.xindex, cell.yindex + 1].GetComponent<Cell>();
+        return b.wholeBoard[cell.homeBoard, cell.xindex, cell.yindex + 1].GetComponent<Cell>(); //On homeBoard
 
     }
 
@@ -79,6 +79,7 @@ public class ClickManager : MonoBehaviour
         cell = MoveDown(cell, piece.GetComponent<Piece>().homeBoard);
         if (IsEmpty(cell))
         {
+            //Get all overlapping colliders (check if piece is on cell)
             BoxCollider2D bc = cell.GetComponent<BoxCollider2D>();
             Collider2D[] results = new Collider2D[5];
             ContactFilter2D cf = new ContactFilter2D().NoFilter();
@@ -88,7 +89,7 @@ public class ClickManager : MonoBehaviour
                 Debug.Log(obj);
                 if (obj.gameObject == piece)
                 {
-                    return true;
+                    return true; //Legal forward move
                 }
             }
         }
