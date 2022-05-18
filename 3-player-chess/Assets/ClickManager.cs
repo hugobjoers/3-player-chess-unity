@@ -103,12 +103,12 @@ public class ClickManager : MonoBehaviour
         {
             if (cell.homeBoard != toBoard)
             {
-                Debug.Log("left " + b.wholeBoard[cell.homeBoard, cell.xindex + 1, cell.yindex]);
+                // Debug.Log("left " + b.wholeBoard[cell.homeBoard, cell.xindex + 1, cell.yindex]);
                 return b.wholeBoard[cell.homeBoard, cell.xindex + 1, cell.yindex].GetComponent<Cell>();
             }
             else
             {
-                Debug.Log("left " + b.wholeBoard[cell.homeBoard, cell.xindex - 1, cell.yindex]);
+                // Debug.Log("left " + b.wholeBoard[cell.homeBoard, cell.xindex - 1, cell.yindex]);
                 return b.wholeBoard[cell.homeBoard, cell.xindex - 1, cell.yindex].GetComponent<Cell>();
             }
         }
@@ -122,9 +122,12 @@ public class ClickManager : MonoBehaviour
         Board b = cell.b.GetComponent<Board>();
         try
         {
+            Debug.Log("MoveRIght");
+            Debug.Log("homeborad" + cell.homeBoard);
             if (cell.homeBoard != toBoard)
             {
-                // Debug.Log("left " + b.wholeBoard[cell.homeBoard, cell.xindex - 1, cell.yindex]);
+                Debug.Log("right ↓");
+                Debug.Log(b.wholeBoard[cell.homeBoard, cell.xindex - 1, cell.yindex]);
                 return b.wholeBoard[cell.homeBoard, cell.xindex - 1, cell.yindex].GetComponent<Cell>();
             }
             else
@@ -143,6 +146,10 @@ public class ClickManager : MonoBehaviour
     {
         int toBoard = piece.GetComponent<Piece>().homeBoard;
         bool onm = PawnOnlyMovement(cell, piece);
+        Cell l = MoveLeft(cell, toBoard);
+        Debug.Log("l " + l);
+        Cell ld = MoveDown(l, toBoard);
+        Debug.Log("ld " + ld);
         bool take = PawnTake(cell, piece, MoveDown(MoveLeft(cell, toBoard), toBoard)) || PawnTake(cell, piece, MoveDown(MoveRight(cell, toBoard), toBoard));
         Debug.Log("onm " + onm);
         Debug.Log("take " + take);
@@ -190,11 +197,11 @@ public class ClickManager : MonoBehaviour
 
     bool PawnTake(Cell cell, GameObject piece, Cell newCell)
     {
-        int toBoard = newCell.homeBoard;
         if (newCell == null)
         {
             return false;
         }
+        int toBoard = newCell.homeBoard;
         Collider2D[] results = Collisions(newCell);
         bool validMove = false;
         foreach (Collider2D obj in results)
@@ -204,37 +211,29 @@ public class ClickManager : MonoBehaviour
                 validMove = true;
             }
         }
-        if (validMove && EnemyIsInCell(cell, newCell, toBoard))
+        if (validMove)
         {
-            Collider2D[] enemy = Collisions(cell);
-            foreach (Collider2D obj in enemy)
-            {
-                if (obj.gameObject.GetComponent<Piece>().homeBoard != toBoard)
-                {
-                    Destroy(obj.gameObject);
-                    newCell.occupied = false;
-                    return true;
-                }
-            }
+            DestroyEnemyInCell(cell, newCell, piece.GetComponent<Piece>().homeBoard);
+            return true;
         }
         return false;
     }
 
-    bool EnemyIsInCell(Cell cell, Cell newCell, int homeColor)
+    void DestroyEnemyInCell(Cell cell, Cell newCell, int takingColor)
     {
         Collider2D[] results = Collisions(cell);
         foreach (Collider2D obj in results)
         {
             if (obj == null)
             {
-                return false;
+                continue;
             }
-            if (obj.CompareTag("piece") && obj.gameObject.GetComponent<Piece>().homeBoard != homeColor) //is an enemy piece
+            if (obj.CompareTag("piece") && obj.gameObject.GetComponent<Piece>().homeBoard != takingColor) //is an enemy piece
             {
-                return true;
+                Destroy(obj.gameObject);
+                newCell.occupied = false;
             }
         }
-        return false;
     }
 
 }
