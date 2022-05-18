@@ -62,7 +62,12 @@ public class Board : MonoBehaviour
                     if (i == 2 || i == 3 && j == 4) //we are on the y index where pieces should be initiated
                     {
                         GameObject piece = Instantiate(GetPiecePrefab(b,j,i), new Vector2((float)pos[0],(float)pos[1]), Quaternion.identity);
-                        piece.name = GetPieceName(b,j,i);
+                        piece.name = GetPieceName(b,j,i) + j;
+                        piece.homeBoard = b;
+                        piece.currentX = j;
+                        piece.currentY = i;
+                        wholeBoard[b,j,i].GetComponent<Cell>().occupied = true;
+                        wholeBoard[b,j,i].GetComponent<Cell>().occupant = b;
                     } 
                 }
             }
