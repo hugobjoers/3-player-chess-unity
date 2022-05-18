@@ -10,6 +10,8 @@ public class Piece : MonoBehaviour
     public int currentY;
 
     void Start()
-    {
+    {   
+        GameObject b = GameObject.FindGameObjectWithTag("all_pieces");
+        gameObject.transform.SetParent(b.transform);
     }
 }
