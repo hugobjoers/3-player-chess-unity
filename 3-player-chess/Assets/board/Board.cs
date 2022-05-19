@@ -63,9 +63,8 @@ public class Board : MonoBehaviour
                     {
                         GameObject piece = Instantiate(GetPiecePrefab(b,j,i), new Vector2((float)pos[0],(float)pos[1]), Quaternion.identity);
                         piece.name = GetPieceName(b,j,i);
+                        piece.GetComponent<Piece>().currentCell = wholeBoard[b,j,i].GetComponent<Cell>();
                         piece.GetComponent<Piece>().homeBoard = b;
-                        piece.GetComponent<Piece>().currentX = j;
-                        piece.GetComponent<Piece>().currentY = i;
                         wholeBoard[b,j,i].GetComponent<Cell>().occupied = true;
                         wholeBoard[b,j,i].GetComponent<Cell>().occupant = b;
                     } 

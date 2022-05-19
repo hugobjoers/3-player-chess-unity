@@ -5,9 +5,7 @@ using UnityEngine;
 public class Piece : MonoBehaviour
 {
     public int homeBoard;
-    public int currentBoard;
-    public int currentX;
-    public int currentY;
+    public Cell currentCell;
 
     void Start()
     {   

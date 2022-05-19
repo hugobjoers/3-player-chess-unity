@@ -36,7 +36,7 @@ public class ClickManager : MonoBehaviour
                 nextClickWillMovePiece = false;
                 PieceZPos(-5);
                 if (IsLegalMove(hit, piece))
-                {
+                {   
                     piece.transform.position = new Vector3(worldPoint.x, worldPoint.y, piece.transform.position.z);
                 }
             }
@@ -62,15 +62,27 @@ public class ClickManager : MonoBehaviour
     {
         GameObject cellObject = hit.collider.gameObject;
         Cell cell = cellObject.GetComponent<Cell>();
-        if (piece.name.Contains("pawn"))
-        {
-            return PawnMovement(cell, piece);
+        Cell currentCell = piece.GetComponent<Piece>().currentCell;
+        if (piece.name.Contains("pawn") && PawnMovement(cell, piece))
+        {   
+            ChangeFieldsCellAndPiece(cell,currentCell,piece.GetComponent<Piece>());
+            return true;
         }
-        else if(piece.name.Contains("king"))
-        {
-            return KingMovement(cell,piece);
+        else if(piece.name.Contains("king") && KingMovement(cell,piece))
+        {   
+            ChangeFieldsCellAndPiece(cell,currentCell,piece.GetComponent<Piece>());
+            return true;
         }
         return false;
+    }
+
+    //updates fields in cells and piece when a move is accepted
+    void ChangeFieldsCellAndPiece(Cell moveToCell, Cell currentCell, Piece piece)
+    {
+        moveToCell.occupant = currentCell.occupant;
+        piece.currentCell = moveToCell;
+        currentCell.occupied = false;
+        moveToCell.occupied = true;
     }
 
     bool IsEmpty(Cell cell)
@@ -99,6 +111,7 @@ public class ClickManager : MonoBehaviour
         }
         return b.wholeBoard[cell.homeBoard, cell.xindex, cell.yindex + 1].GetComponent<Cell>(); //On homeBoard
     }
+
 
 
         Cell MoveLeft(Cell cell, int toBoard)
@@ -141,6 +154,8 @@ public class ClickManager : MonoBehaviour
             }
         }
 
+
+
         bool PawnMovement(Cell cell, GameObject piece)
         {
             int toBoard = piece.GetComponent<Piece>().homeBoard;
@@ -169,8 +184,6 @@ public class ClickManager : MonoBehaviour
                     }
                     if (obj.gameObject == piece)
                     {
-                        cell.occupied = true;
-                        newCell.occupied = false;
                         return true; //Legal forward move
                     }
                 }
@@ -214,26 +227,66 @@ public class ClickManager : MonoBehaviour
 
     bool KingMovement(Cell cell, GameObject piece)
     {  
-        //if cell is not in contact with current cell, return false 
-        if( cell.homeBoard != piece.GetComponent<Piece>().currentBoard && cell.yindex != 0) //trying to move accross board but not adjacent to other board
-        {
-            return false;
-        }
-        else if(Math.Abs(cell.xindex - piece.GetComponent<Piece>().currentX) > 1 || Math.Abs(cell.yindex -piece.GetComponent<Piece>().currentY) >1) //trying to move further than one step
+        Piece pieceCodeVersion = piece.GetComponent<Piece>();
+        Cell currentCell = pieceCodeVersion.currentCell;
+
+        //this part makes sure move is within the range of the king
+        if(!KingRange(cell, currentCell))
         {
             return false;
         }
 
-        //if is within range, we want to take the piece on the cell we are moving to if the cell is occupied
-       if(cell.occupied)
-       {
-            //take piece
+        //diffrent things should happen whether a piece is standing on cell already, and depending on who
+        if(cell.occupied && cell.occupant == pieceCodeVersion.homeBoard) //a piece of own team occupies cell
+        {
+            return false;
+        }
+        else if (!cell.occupied){
             return true;
+        }
+        else if(cell.occupied && cell.occupant != pieceCodeVersion.homeBoard) //a piece of other team occupies cell, should be captured
+        {    
+            Collider2D[] thingsOnTheCell = Collisions(cell);
+            foreach (Collider2D thing in thingsOnTheCell)
+            {
+                if (thing == null)
+                {   
+                    continue;
+                }
+                else if (thing.CompareTag("piece"))
+                {   
+                    if(thing.GetComponent<Piece>().name.Contains("king"))
+                    {
+                        Application.Quit();
+                        UnityEditor.EditorApplication.isPlaying = false;
+                    }
+                    Destroy(thing.gameObject);
+                    return true;
+                }
+            }
        }
-       else
-       {
-           return true;
-       }
+       return false;
+    }
+
+    bool KingRange(Cell cell, Cell currentCell)
+    {   
+        bool tryingToMoveToOtherBoard = cell.homeBoard != currentCell.homeBoard;
+        if (tryingToMoveToOtherBoard && cell.yindex == 0 && currentCell.yindex == 0) //we are trying to move from one home board border to other
+        {
+            bool moveStraightAccross = cell.xindex + currentCell.xindex == 7;
+            bool moveDiagonallyAccross = cell.xindex + currentCell.xindex == 1 || cell.xindex + currentCell.xindex == 8;
+            return moveStraightAccross || moveDiagonallyAccross;
+        }
+        else if (!tryingToMoveToOtherBoard)
+        {
+            bool moveWithinXRange = Math.Abs(cell.xindex - currentCell.xindex) <= 1;
+            bool moveWithinYRange = Math.Abs(cell.yindex - currentCell.yindex) <= 1;
+            return moveWithinXRange && moveWithinYRange;
+        }
+        else
+        {
+            return false;
+        }
 
     }
 
@@ -249,8 +302,12 @@ public class ClickManager : MonoBehaviour
                 }
                 if (obj.CompareTag("piece") && obj.gameObject.GetComponent<Piece>().homeBoard != takingColor) //is an enemy piece
                 {
+                    if(obj.GetComponent<Piece>().name.Contains("king"))
+                    {
+                        Application.Quit();
+                        UnityEditor.EditorApplication.isPlaying = false;
+                    }
                     Destroy(obj.gameObject);
-                    newCell.occupied = false;
                 }
             }
         }
