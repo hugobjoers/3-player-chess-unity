@@ -232,7 +232,7 @@ public class ClickManager : MonoBehaviour
         return false;
     }
 
-    bool EnemyIsInCell(Cell cell, int takingColor)
+    bool EnemyIsInCell(Cell cell, int ownColor)
     {
         Collider2D[] results = Collisions(cell);
         foreach (Collider2D obj in results)
@@ -241,7 +241,7 @@ public class ClickManager : MonoBehaviour
             {
                 continue;
             }
-            if (obj.CompareTag("piece") && obj.gameObject.GetComponent<Piece>().homeBoard != takingColor) //is an enemy piece
+            if (obj.CompareTag("piece") && obj.gameObject.GetComponent<Piece>().homeBoard != ownColor) //is an enemy piece
             {
                 return true;
             }
@@ -249,7 +249,7 @@ public class ClickManager : MonoBehaviour
         return false;
     }
 
-    void DestroyEnemyInCell(Cell cell, Cell newCell, int takingColor)
+    void DestroyEnemyInCell(Cell cell, Cell newCell, int ownColor)
     {
         Collider2D[] results = Collisions(cell);
         foreach (Collider2D obj in results)
@@ -258,7 +258,7 @@ public class ClickManager : MonoBehaviour
             {
                 continue;
             }
-            if (obj.CompareTag("piece") && obj.gameObject.GetComponent<Piece>().homeBoard != takingColor) //is an enemy piece
+            if (obj.CompareTag("piece") && obj.gameObject.GetComponent<Piece>().homeBoard != ownColor) //is an enemy piece
             {
                 Destroy(obj.gameObject);
                 newCell.occupied = false;
