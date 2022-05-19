@@ -289,7 +289,7 @@ public class ClickManager : MonoBehaviour
         if (tryingToMoveToOtherBoard && cell.yindex == 0 && currentCell.yindex == 0) //we are trying to move from one home board border to other
         {
             bool moveStraightAccross = cell.xindex + currentCell.xindex == 7;
-            bool moveDiagonallyAccross = cell.xindex + currentCell.xindex == 1 || cell.xindex + currentCell.xindex == 8;
+            bool moveDiagonallyAccross = cell.xindex + currentCell.xindex == 6 || cell.xindex + currentCell.xindex == 8;
             return moveStraightAccross || moveDiagonallyAccross;
         }
         else if (!tryingToMoveToOtherBoard)
