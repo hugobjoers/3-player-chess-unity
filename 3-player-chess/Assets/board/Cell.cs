@@ -25,7 +25,8 @@ public class Cell : MonoBehaviour
     public int occupant; 
     //signifies the colour of occupiying piece
     //0 if white, 1 if yellow, 2 if black
-
+    
+    public GameObject pieceOnCell;
 
 
 

@@ -5,19 +5,11 @@ using UnityEngine;
 public class Piece : MonoBehaviour
 {
     public int homeBoard;
+    public Cell currentCell;
+
     void Start()
-    {
-        if(gameObject.name.Contains("white"))
-        {
-            homeBoard = 0;
-        }
-        else if(gameObject.name.Contains("yellow"))
-        {
-            homeBoard = 1;
-        }
-        else if(gameObject.name.Contains("black"))
-        {
-            homeBoard = 2;
-        }
+    {   
+        GameObject b = GameObject.FindGameObjectWithTag("all_pieces");
+        gameObject.transform.SetParent(b.transform);
     }
 }

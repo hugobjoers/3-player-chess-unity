@@ -63,7 +63,17 @@ public class Board : MonoBehaviour
                     {
                         GameObject piece = Instantiate(GetPiecePrefab(b,j,i), new Vector2((float)pos[0],(float)pos[1]), Quaternion.identity);
                         piece.name = GetPieceName(b,j,i);
-                    } 
+                        piece.GetComponent<Piece>().currentCell = wholeBoard[b,j,i].GetComponent<Cell>();
+                        piece.GetComponent<Piece>().homeBoard = b;
+                        wholeBoard[b,j,i].GetComponent<Cell>().occupied = true;
+                        wholeBoard[b,j,i].GetComponent<Cell>().occupant = b;
+                        wholeBoard[b,j,i].GetComponent<Cell>().pieceOnCell = piece;
+                    }
+                    else
+                    {
+                        wholeBoard[b,j,i].GetComponent<Cell>().occupied = false;
+                        wholeBoard[b,j,i].GetComponent<Cell>().pieceOnCell = null;
+                    }
                 }
             }
         }
@@ -130,12 +140,14 @@ public class Board : MonoBehaviour
         if(i == 2)
         {
             pieceName = "pawn_";
+            pieceName += pieceColors[b];
+            pieceName += j;
         }
         else if(j == 4)
         {
             pieceName = "king_";
+            pieceName += pieceColors[b];
         }
-        pieceName += pieceColors[b];
         return pieceName;
         
     }
