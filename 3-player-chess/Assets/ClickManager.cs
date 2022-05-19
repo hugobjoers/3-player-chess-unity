@@ -298,27 +298,18 @@ public class ClickManager : MonoBehaviour
 
 
     void DestroyEnemyInCell(Cell cell, Cell newCell, int takingColor)
-    {
-        Collider2D[] results = Collisions(cell);
-        foreach (Collider2D obj in results)
+    {   
+        if (cell.pieceOnCell!= null && cell.pieceOnCell.GetComponent<Piece>().homeBoard != takingColor)
         {
-            if (obj == null)
+            GameObject pieceToBeCaptured = cell.pieceOnCell;
+            if(pieceToBeCaptured.GetComponent<Piece>().name.Contains("king"))
             {
-                if (obj == null)
-                {
-                    continue;
-                }
-                if (obj.CompareTag("piece") && obj.gameObject.GetComponent<Piece>().homeBoard != takingColor) //is an enemy piece
-                {
-                    if(obj.GetComponent<Piece>().name.Contains("king"))
-                    {
-                        Application.Quit();
-                        UnityEditor.EditorApplication.isPlaying = false;
-                    }
-                    Destroy(obj.gameObject);
-                }
+                Application.Quit();
+                UnityEditor.EditorApplication.isPlaying = false;
             }
+            Destroy(pieceToBeCaptured);
         }
+
     }
 
 }

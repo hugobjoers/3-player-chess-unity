@@ -68,7 +68,12 @@ public class Board : MonoBehaviour
                         wholeBoard[b,j,i].GetComponent<Cell>().occupied = true;
                         wholeBoard[b,j,i].GetComponent<Cell>().occupant = b;
                         wholeBoard[b,j,i].GetComponent<Cell>().pieceOnCell = piece;
-                    } 
+                    }
+                    else
+                    {
+                        wholeBoard[b,j,i].GetComponent<Cell>().occupied = false;
+                        wholeBoard[b,j,i].GetComponent<Cell>().pieceOnCell = null;
+                    }
                 }
             }
         }
