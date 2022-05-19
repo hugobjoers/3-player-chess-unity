@@ -47,7 +47,9 @@ public class ClickManager : MonoBehaviour
             }
         }
     }
-
+    ///<summary>
+    ///Sets all pieces z-position to the parameter
+    ///</summary>
     void PieceZPos(int z)
     {
         GameObject[] pieces = GameObject.FindGameObjectsWithTag("piece");
@@ -66,10 +68,10 @@ public class ClickManager : MonoBehaviour
         {
             return PawnMovement(cell, piece);
         }
-        else if(piece.name.Contains("king"))
+        else if (piece.name.Contains("king"))
         {
             Debug.Log("kingmovement");
-            return KingMovement(cell,piece);
+            return KingMovement(cell, piece);
         }
         return false;
     }
@@ -82,6 +84,9 @@ public class ClickManager : MonoBehaviour
         }
         return !cell.occupied;
     }
+    ///<returns>
+    ///The cell one position down. What is considered down depends on toBoard. If toBoard is 0, 0 is the board direction that is considered down.
+    ///</returns>
     Cell MoveDown(Cell cell, int toBoard)
     {
         if (cell == null)
@@ -101,116 +106,129 @@ public class ClickManager : MonoBehaviour
         return b.wholeBoard[cell.homeBoard, cell.xindex, cell.yindex + 1].GetComponent<Cell>(); //On homeBoard
     }
 
-
-        Cell MoveLeft(Cell cell, int toBoard)
+    ///<returns>
+    ///The cell one position to the left.
+    ///</returns>
+    Cell MoveLeft(Cell cell, int toBoard)
+    {
+        Board b = cell.b.GetComponent<Board>();
+        try
         {
-            Board b = cell.b.GetComponent<Board>();
-            try
+            if (cell.homeBoard != toBoard)
             {
-                if (cell.homeBoard != toBoard)
-                {
-                    return b.wholeBoard[cell.homeBoard, cell.xindex + 1, cell.yindex].GetComponent<Cell>();
-                }
-                else
-                {
-                    return b.wholeBoard[cell.homeBoard, cell.xindex - 1, cell.yindex].GetComponent<Cell>();
-                }
+                return b.wholeBoard[cell.homeBoard, cell.xindex + 1, cell.yindex].GetComponent<Cell>();
             }
-            catch (System.IndexOutOfRangeException)
+            else
             {
-                return null;
+                return b.wholeBoard[cell.homeBoard, cell.xindex - 1, cell.yindex].GetComponent<Cell>();
             }
         }
-        Cell MoveRight(Cell cell, int toBoard)
+        catch (System.IndexOutOfRangeException)
         {
-            Board b = cell.b.GetComponent<Board>();
-            try
+            return null;
+        }
+    }
+    ///<returns>
+    ///The cell one position to the right.
+    ///</returns>
+    Cell MoveRight(Cell cell, int toBoard)
+    {
+        Board b = cell.b.GetComponent<Board>();
+        try
+        {
+            if (cell.homeBoard != toBoard)
             {
-                if (cell.homeBoard != toBoard)
-                {
-                    Debug.Log(b.wholeBoard[cell.homeBoard, cell.xindex - 1, cell.yindex]);
-                    return b.wholeBoard[cell.homeBoard, cell.xindex - 1, cell.yindex].GetComponent<Cell>();
-                }
-                else
-                {
-                    return b.wholeBoard[cell.homeBoard, cell.xindex + 1, cell.yindex].GetComponent<Cell>();
-                }
+                Debug.Log(b.wholeBoard[cell.homeBoard, cell.xindex - 1, cell.yindex]);
+                return b.wholeBoard[cell.homeBoard, cell.xindex - 1, cell.yindex].GetComponent<Cell>();
             }
-            catch (System.IndexOutOfRangeException)
+            else
             {
-                return null;
+                return b.wholeBoard[cell.homeBoard, cell.xindex + 1, cell.yindex].GetComponent<Cell>();
             }
         }
-
-        bool PawnMovement(Cell cell, GameObject piece)
+        catch (System.IndexOutOfRangeException)
         {
-            int toBoard = piece.GetComponent<Piece>().homeBoard;
-            bool onm = PawnOnlyMovement(cell, piece);
-            bool take = PawnTake(cell, piece, MoveDown(MoveLeft(cell, toBoard), toBoard)) || PawnTake(cell, piece, MoveDown(MoveRight(cell, toBoard), toBoard));
-            return onm || take;
+            return null;
         }
+    }
 
-        bool PawnOnlyMovement(Cell cell, GameObject piece)
+    bool PawnMovement(Cell cell, GameObject piece)
+    {
+        int toBoard = piece.GetComponent<Piece>().homeBoard;
+        bool onm = PawnOnlyMovement(cell, piece);
+        bool take = PawnTake(cell, piece, MoveDown(MoveLeft(cell, toBoard), toBoard)) || PawnTake(cell, piece, MoveDown(MoveRight(cell, toBoard), toBoard));
+        return onm || take;
+    }
+
+    ///<summary>
+    ///Checks if moving upwards is legal
+    ///</summary>
+    bool PawnOnlyMovement(Cell cell, GameObject piece)
+    {
+        int toBoard = piece.GetComponent<Piece>().homeBoard;
+        Cell newCell = MoveDown(cell, toBoard);
+        Debug.Log("down newCell" + newCell);
+        if (newCell == null)
         {
-            int toBoard = piece.GetComponent<Piece>().homeBoard;
-            Cell newCell = MoveDown(cell, toBoard);
-            Debug.Log("down newCell" + newCell);
-            if (newCell == null)
-            {
-                return false;
-            }
-            if (IsEmpty(cell))
-            {
-                Collider2D[] results = Collisions(newCell);
-                foreach (Collider2D obj in results)
-                {
-                    if (obj == null)
-                    {
-                        return false;
-                    }
-                    if (obj.gameObject == piece)
-                    {
-                        cell.occupied = true;
-                        newCell.occupied = false;
-                        return true; //Legal forward move
-                    }
-                }
-            }
             return false;
         }
-
-        Collider2D[] Collisions(Cell newCell)
+        if (IsEmpty(cell))
         {
-            BoxCollider2D bc = newCell.GetComponent<BoxCollider2D>();
-            Collider2D[] results = new Collider2D[5];
-            ContactFilter2D cf = new ContactFilter2D().NoFilter();
-            bc.OverlapCollider(cf, results);
-            return results;
-        }
-
-        bool PawnTake(Cell cell, GameObject piece, Cell newCell)
-        {
-            if (newCell == null)
-            {
-                return false;
-            }
-            int toBoard = newCell.homeBoard;
             Collider2D[] results = Collisions(newCell);
-            bool validMove = false;
             foreach (Collider2D obj in results)
             {
-                if (obj != null && obj.gameObject == piece)
+                if (obj == null)
                 {
-                    validMove = true;
+                    return false;
+                }
+                if (obj.gameObject == piece)
+                {
+                    cell.occupied = true;
+                    newCell.occupied = false;
+                    return true; //Legal forward move
                 }
             }
-            if (validMove)
-            {
-                DestroyEnemyInCell(cell, newCell, piece.GetComponent<Piece>().homeBoard);
-                return true;
-            }
+        }
+        return false;
+    }
+    ///<returns>
+    ///The colliders that overlap with the parameter.
+    ///</returns>
+    Collider2D[] Collisions(Cell newCell)
+    {
+        BoxCollider2D bc = newCell.GetComponent<BoxCollider2D>();
+        Collider2D[] results = new Collider2D[5];
+        ContactFilter2D cf = new ContactFilter2D().NoFilter();
+        bc.OverlapCollider(cf, results);
+        return results;
+    }
+
+    /// <summary>
+    /// Checks if taking is legal
+    /// </summary>
+    bool PawnTake(Cell cell, GameObject piece, Cell newCell)
+    {
+        if (newCell == null)
+        {
             return false;
         }
+        int toBoard = newCell.homeBoard;
+        Collider2D[] results = Collisions(newCell);
+        bool validMove = false;
+        foreach (Collider2D obj in results)
+        {
+            if (obj != null && obj.gameObject == piece)
+            {
+                validMove = true;
+            }
+        }
+        if (validMove)
+        {
+            DestroyEnemyInCell(cell, newCell, piece.GetComponent<Piece>().homeBoard);
+            return true;
+        }
+        return false;
+    }
 
 
     bool KingMovement(Cell cell, GameObject piece)
@@ -219,21 +237,21 @@ public class ClickManager : MonoBehaviour
     }
 
 
-        void DestroyEnemyInCell(Cell cell, Cell newCell, int takingColor)
+    void DestroyEnemyInCell(Cell cell, Cell newCell, int takingColor)
+    {
+        Collider2D[] results = Collisions(cell);
+        foreach (Collider2D obj in results)
         {
-            Collider2D[] results = Collisions(cell);
-            foreach (Collider2D obj in results)
+            if (obj == null)
             {
-                if (obj == null)
-                {
-                    continue;
-                }
-                if (obj.CompareTag("piece") && obj.gameObject.GetComponent<Piece>().homeBoard != takingColor) //is an enemy piece
-                {
-                    Destroy(obj.gameObject);
-                    newCell.occupied = false;
-                }
+                continue;
+            }
+            if (obj.CompareTag("piece") && obj.gameObject.GetComponent<Piece>().homeBoard != takingColor) //is an enemy piece
+            {
+                Destroy(obj.gameObject);
+                newCell.occupied = false;
             }
         }
+    }
 
 }
