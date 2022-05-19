@@ -140,6 +140,7 @@ public class ClickManager : MonoBehaviour
             return null;
         }
     }
+
     ///<returns>
     ///The cell one position to the right.
     ///</returns>
@@ -150,7 +151,6 @@ public class ClickManager : MonoBehaviour
         {
             if (cell.homeBoard != toBoard)
             {
-                Debug.Log(b.wholeBoard[cell.homeBoard, cell.xindex - 1, cell.yindex]);
                 return b.wholeBoard[cell.homeBoard, cell.xindex - 1, cell.yindex].GetComponent<Cell>();
             }
             else
@@ -168,7 +168,9 @@ public class ClickManager : MonoBehaviour
     {
         int toBoard = piece.GetComponent<Piece>().homeBoard;
         bool onm = PawnOnlyMovement(cell, piece);
-        bool take = PawnTake(cell, piece, MoveDown(MoveLeft(cell, toBoard), toBoard)) || PawnTake(cell, piece, MoveDown(MoveRight(cell, toBoard), toBoard));
+        bool takeLeft = PawnTake(cell, piece, MoveDown(MoveLeft(cell, toBoard), toBoard));
+        bool takeRight = PawnTake(cell, piece, MoveDown(MoveRight(cell, toBoard), toBoard));
+        bool take = takeLeft || takeRight;
         return onm || take;
     }
 
@@ -179,7 +181,6 @@ public class ClickManager : MonoBehaviour
     {
         int toBoard = piece.GetComponent<Piece>().homeBoard;
         Cell newCell = MoveDown(cell, toBoard);
-        Debug.Log("down newCell" + newCell);
         if (newCell == null)
         {
             return false;
@@ -201,6 +202,7 @@ public class ClickManager : MonoBehaviour
         }
         return false;
     }
+
     ///<returns>
     ///The colliders that overlap with the parameter.
     ///</returns>
@@ -232,13 +234,31 @@ public class ClickManager : MonoBehaviour
                 validMove = true;
             }
         }
-        if (validMove)
+        if (validMove && EnemyIsInCell(cell, piece.GetComponent<Piece>().homeBoard))
         {
             DestroyEnemyInCell(cell, newCell, piece.GetComponent<Piece>().homeBoard);
             return true;
         }
         return false;
     }
+
+    bool EnemyIsInCell(Cell cell, int ownColor)
+    {
+        Collider2D[] results = Collisions(cell);
+        foreach (Collider2D obj in results)
+        {
+            if (obj == null)
+            {
+                continue;
+            }
+            if (obj.CompareTag("piece") && obj.gameObject.GetComponent<Piece>().homeBoard != ownColor) //is an enemy piece
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 
     bool KingMovement(Cell cell, GameObject piece)
@@ -254,6 +274,7 @@ public class ClickManager : MonoBehaviour
 
         //diffrent things should happen whether a piece is standing on cell already, and depending on who
         if(cell.occupied && cell.occupant == pieceCodeVersion.homeBoard) //a piece of own team occupies cell
+
         {
             return false;
         }
@@ -273,8 +294,9 @@ public class ClickManager : MonoBehaviour
        }
        return false;
     }
-
-    bool KingRange(Cell cell, Cell currentCell)
+    
+    
+     bool KingRange(Cell cell, Cell currentCell)
     {   
         bool tryingToMoveToOtherBoard = cell.homeBoard != currentCell.homeBoard;
         if (tryingToMoveToOtherBoard && cell.yindex == 0 && currentCell.yindex == 0) //we are trying to move from one home board border to other
@@ -296,13 +318,13 @@ public class ClickManager : MonoBehaviour
 
     }
 
-
     void DestroyEnemyInCell(Cell cell, Cell newCell, int takingColor)
     {   
         if (cell.pieceOnCell!= null && cell.pieceOnCell.GetComponent<Piece>().homeBoard != takingColor)
         {
             GameObject pieceToBeCaptured = cell.pieceOnCell;
             if(pieceToBeCaptured.GetComponent<Piece>().name.Contains("king"))
+
             {
                 Application.Quit();
                 UnityEditor.EditorApplication.isPlaying = false;
@@ -311,5 +333,4 @@ public class ClickManager : MonoBehaviour
         }
 
     }
-
 }
