@@ -36,7 +36,7 @@ public class ClickManager : MonoBehaviour
                 nextClickWillMovePiece = false;
                 PieceZPos(-5);
                 if (IsLegalMove(hit, piece))
-                {
+                {   
                     piece.transform.position = new Vector3(worldPoint.x, worldPoint.y, piece.transform.position.z);
                 }
             }
@@ -64,16 +64,28 @@ public class ClickManager : MonoBehaviour
     {
         GameObject cellObject = hit.collider.gameObject;
         Cell cell = cellObject.GetComponent<Cell>();
-        if (piece.name.Contains("pawn"))
-        {
-            return PawnMovement(cell, piece);
+        Cell currentCell = piece.GetComponent<Piece>().currentCell;
+        if (piece.name.Contains("pawn") && PawnMovement(cell, piece))
+        {   
+            ChangeFieldsCellAndPiece(cell,currentCell,piece);
+            return true;
         }
-        else if (piece.name.Contains("king"))
-        {
-            Debug.Log("kingmovement");
-            return KingMovement(cell, piece);
+        else if(piece.name.Contains("king") && KingMovement(cell,piece))
+        {   
+            ChangeFieldsCellAndPiece(cell,currentCell,piece);
+            return true;
         }
         return false;
+    }
+
+    //updates fields in cells and piece when a move is accepted
+    void ChangeFieldsCellAndPiece(Cell moveToCell, Cell currentCell, GameObject piece)
+    {
+        moveToCell.occupant = currentCell.occupant;
+        piece.GetComponent<Piece>().currentCell = moveToCell;
+        currentCell.occupied = false;
+        moveToCell.occupied = true;
+        moveToCell.pieceOnCell = piece;
     }
 
     bool IsEmpty(Cell cell)
@@ -183,8 +195,6 @@ public class ClickManager : MonoBehaviour
                 }
                 if (obj.gameObject == piece)
                 {
-                    cell.occupied = true;
-                    newCell.occupied = false;
                     return true; //Legal forward move
                 }
             }
@@ -232,26 +242,74 @@ public class ClickManager : MonoBehaviour
 
 
     bool KingMovement(Cell cell, GameObject piece)
-    {
-        return PawnMovement(cell, piece);
+    {  
+        Piece pieceCodeVersion = piece.GetComponent<Piece>();
+        Cell currentCell = pieceCodeVersion.currentCell;
+
+        //this part makes sure move is within the range of the king
+        if(!KingRange(cell, currentCell))
+        {
+            return false;
+        }
+
+        //diffrent things should happen whether a piece is standing on cell already, and depending on who
+        if(cell.occupied && cell.occupant == pieceCodeVersion.homeBoard) //a piece of own team occupies cell
+        {
+            return false;
+        }
+        else if (!cell.occupied){
+            return true;
+        }
+        else if(cell.occupied && cell.occupant != pieceCodeVersion.homeBoard) //a piece of other team occupies cell, should be captured
+        {    
+            GameObject pieceToBeCaptured = cell.pieceOnCell;
+            if(pieceToBeCaptured.GetComponent<Piece>().name.Contains("king"))
+            {
+                Application.Quit();
+                UnityEditor.EditorApplication.isPlaying = false;
+            }
+            Destroy(pieceToBeCaptured);
+            return true;
+       }
+       return false;
+    }
+
+    bool KingRange(Cell cell, Cell currentCell)
+    {   
+        bool tryingToMoveToOtherBoard = cell.homeBoard != currentCell.homeBoard;
+        if (tryingToMoveToOtherBoard && cell.yindex == 0 && currentCell.yindex == 0) //we are trying to move from one home board border to other
+        {
+            bool moveStraightAccross = cell.xindex + currentCell.xindex == 7;
+            bool moveDiagonallyAccross = cell.xindex + currentCell.xindex == 6 || cell.xindex + currentCell.xindex == 8;
+            return moveStraightAccross || moveDiagonallyAccross;
+        }
+        else if (!tryingToMoveToOtherBoard)
+        {
+            bool moveWithinXRange = Math.Abs(cell.xindex - currentCell.xindex) <= 1;
+            bool moveWithinYRange = Math.Abs(cell.yindex - currentCell.yindex) <= 1;
+            return moveWithinXRange && moveWithinYRange;
+        }
+        else
+        {
+            return false;
+        }
+
     }
 
 
     void DestroyEnemyInCell(Cell cell, Cell newCell, int takingColor)
-    {
-        Collider2D[] results = Collisions(cell);
-        foreach (Collider2D obj in results)
+    {   
+        if (cell.pieceOnCell!= null && cell.pieceOnCell.GetComponent<Piece>().homeBoard != takingColor)
         {
-            if (obj == null)
+            GameObject pieceToBeCaptured = cell.pieceOnCell;
+            if(pieceToBeCaptured.GetComponent<Piece>().name.Contains("king"))
             {
-                continue;
+                Application.Quit();
+                UnityEditor.EditorApplication.isPlaying = false;
             }
-            if (obj.CompareTag("piece") && obj.gameObject.GetComponent<Piece>().homeBoard != takingColor) //is an enemy piece
-            {
-                Destroy(obj.gameObject);
-                newCell.occupied = false;
-            }
+            Destroy(pieceToBeCaptured);
         }
+
     }
 
 }
