@@ -67,24 +67,25 @@ public class ClickManager : MonoBehaviour
         Cell currentCell = piece.GetComponent<Piece>().currentCell;
         if (piece.name.Contains("pawn") && PawnMovement(cell, piece))
         {   
-            ChangeFieldsCellAndPiece(cell,currentCell,piece.GetComponent<Piece>());
+            ChangeFieldsCellAndPiece(cell,currentCell,piece);
             return true;
         }
         else if(piece.name.Contains("king") && KingMovement(cell,piece))
         {   
-            ChangeFieldsCellAndPiece(cell,currentCell,piece.GetComponent<Piece>());
+            ChangeFieldsCellAndPiece(cell,currentCell,piece);
             return true;
         }
         return false;
     }
 
     //updates fields in cells and piece when a move is accepted
-    void ChangeFieldsCellAndPiece(Cell moveToCell, Cell currentCell, Piece piece)
+    void ChangeFieldsCellAndPiece(Cell moveToCell, Cell currentCell, GameObject piece)
     {
         moveToCell.occupant = currentCell.occupant;
-        piece.currentCell = moveToCell;
+        piece.GetComponent<Piece>().currentCell = moveToCell;
         currentCell.occupied = false;
         moveToCell.occupied = true;
+        moveToCell.pieceOnCell = piece;
     }
 
     bool IsEmpty(Cell cell)
@@ -261,24 +262,14 @@ public class ClickManager : MonoBehaviour
         }
         else if(cell.occupied && cell.occupant != pieceCodeVersion.homeBoard) //a piece of other team occupies cell, should be captured
         {    
-            Collider2D[] thingsOnTheCell = Collisions(cell);
-            foreach (Collider2D thing in thingsOnTheCell)
+            GameObject pieceToBeCaptured = cell.pieceOnCell;
+            if(pieceToBeCaptured.GetComponent<Piece>().name.Contains("king"))
             {
-                if (thing == null)
-                {   
-                    continue;
-                }
-                else if (thing.CompareTag("piece"))
-                {   
-                    if(thing.GetComponent<Piece>().name.Contains("king"))
-                    {
-                        Application.Quit();
-                        UnityEditor.EditorApplication.isPlaying = false;
-                    }
-                    Destroy(thing.gameObject);
-                    return true;
-                }
+                Application.Quit();
+                UnityEditor.EditorApplication.isPlaying = false;
             }
+            Destroy(pieceToBeCaptured);
+            return true;
        }
        return false;
     }
