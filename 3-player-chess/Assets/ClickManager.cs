@@ -47,7 +47,9 @@ public class ClickManager : MonoBehaviour
             }
         }
     }
-
+    ///<summary>
+    ///Sets all pieces z-position to the parameter
+    ///</summary>
     void PieceZPos(int z)
     {
         GameObject[] pieces = GameObject.FindGameObjectsWithTag("piece");
@@ -66,6 +68,11 @@ public class ClickManager : MonoBehaviour
         {
             return PawnMovement(cell, piece);
         }
+        else if (piece.name.Contains("king"))
+        {
+            Debug.Log("kingmovement");
+            return KingMovement(cell, piece);
+        }
         return false;
     }
 
@@ -77,6 +84,9 @@ public class ClickManager : MonoBehaviour
         }
         return !cell.occupied;
     }
+    ///<returns>
+    ///The cell one position down. What is considered down depends on toBoard. If toBoard is 0, 0 is the board direction that is considered down.
+    ///</returns>
     Cell MoveDown(Cell cell, int toBoard)
     {
         if (cell == null)
@@ -96,6 +106,9 @@ public class ClickManager : MonoBehaviour
         return b.wholeBoard[cell.homeBoard, cell.xindex, cell.yindex + 1].GetComponent<Cell>(); //On homeBoard
     }
 
+    ///<returns>
+    ///The cell one position to the left.
+    ///</returns>
     Cell MoveLeft(Cell cell, int toBoard)
     {
         Board b = cell.b.GetComponent<Board>();
@@ -115,6 +128,10 @@ public class ClickManager : MonoBehaviour
             return null;
         }
     }
+
+    ///<returns>
+    ///The cell one position to the right.
+    ///</returns>
     Cell MoveRight(Cell cell, int toBoard)
     {
         Board b = cell.b.GetComponent<Board>();
@@ -145,6 +162,9 @@ public class ClickManager : MonoBehaviour
         return onm || take;
     }
 
+    ///<summary>
+    ///Checks if moving upwards is legal
+    ///</summary>
     bool PawnOnlyMovement(Cell cell, GameObject piece)
     {
         int toBoard = piece.GetComponent<Piece>().homeBoard;
@@ -173,6 +193,9 @@ public class ClickManager : MonoBehaviour
         return false;
     }
 
+    ///<returns>
+    ///The colliders that overlap with the parameter.
+    ///</returns>
     Collider2D[] Collisions(Cell newCell)
     {
         BoxCollider2D bc = newCell.GetComponent<BoxCollider2D>();
@@ -182,6 +205,9 @@ public class ClickManager : MonoBehaviour
         return results;
     }
 
+    /// <summary>
+    /// Checks if taking is legal
+    /// </summary>
     bool PawnTake(Cell cell, GameObject piece, Cell newCell)
     {
         if (newCell == null)
@@ -238,5 +264,9 @@ public class ClickManager : MonoBehaviour
                 newCell.occupied = false;
             }
         }
+    }
+    bool KingMovement(Cell cell, GameObject piece)
+    {
+        return PawnMovement(cell, piece);
     }
 }
