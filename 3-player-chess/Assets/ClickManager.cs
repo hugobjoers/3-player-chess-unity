@@ -287,7 +287,7 @@ public class ClickManager : MonoBehaviour
             if(pieceToBeCaptured.GetComponent<Piece>().name.Contains("king"))
             {
                 Application.Quit();
-                UnityEditor.EditorApplication.isPlaying = false;
+                //UnityEditor.EditorApplication.isPlaying = false;
             }
             Destroy(pieceToBeCaptured);
             return true;
@@ -327,7 +327,7 @@ public class ClickManager : MonoBehaviour
 
             {
                 Application.Quit();
-                UnityEditor.EditorApplication.isPlaying = false;
+               // UnityEditor.EditorApplication.isPlaying = false;
             }
             Destroy(pieceToBeCaptured);
         }
